@@ -2,15 +2,19 @@
   <div>
 
     <label>Due date
-      <input type="date" v-model="newTask.dueDate">
+      <input  style="width:11rem;" type="date" v-model="newTask.dueDate">
     </label>
 
     <label>Title
-      <input type="text" v-model.trim="newTask.title" @keyup.enter="addTask">
+      <input  style="width:11rem;" type="text" v-model.trim="newTask.title" @keyup.enter="addTask">
+    </label>
+
+    <label>Description
+      <input style="width:11rem;" type="text" v-model.trim="newTask.description" @keyup.enter="addTask">
     </label>
 
     <select style="background-color: #E74C3C; color: white;
-     border-radius: 5%; border: 1px solid #2c3e50; margin-left: 2.5rem;"
+     border-radius: 5%; border: 1px solid #2c3e50;"
       v-model="newTask.priority">
       <option value="high">high</option>
       <option value="medium">medium</option>
@@ -18,7 +22,7 @@
     </select>
 
     <button
-      style="background-color: #E74C3C; color: white; border-radius: 5%; border: 1px solid #2c3e50; margin-top: 2rem;"
+      style="background-color: #E74C3C; color: white; border-radius: 5%; border: 1px solid #2c3e50; margin-top:1rem;"
       @click="addTask"
     >Add Task</button>
 

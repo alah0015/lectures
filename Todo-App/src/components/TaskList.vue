@@ -48,9 +48,9 @@
     <ul class="task-list">
       <li v-for="task in sortedTasks" :key="task.id" class="task-item">
        <span v-if="(task.id === isEditing)">
-         <h2>Title</h2>
+         <label>Title</label>
          <input type="text" v-model="editingTask.title">
-         <h2>Description</h2>
+         <label>Description</label>
          <input type="text" v-model="editingTask.description">
 
           <div class="toolbar">
@@ -100,20 +100,20 @@
         <span style="color: #E74C3C; margin-right: 3rem;"
          class="fa"
           :class="{
-            'fa-circle': ! task.isComplete,
+            'fa fa-circle-o': ! task.isComplete,
             'fa-check-circle': task.isComplete
           }"
           @click="toggleDone(task)"></span>
 
         <span style="cursor: pointer; padding-right:10rem;"
          @click="setIsEditing(task)">{{ task.title }}</span>
-        <span  style="color: #E74C3C; margin-right: 3rem;"
+        <span  style="color: #E74C3C; margin-right: 3rem; font-size:10px;"
         >{{ task.priority }}</span>
-        <span style="color: #979A9A; margin-right: 4rem;
-          position: sticky;">{{task.category}}</span>
+        <span style="color: #979A9A; margin-right: 3rem;
+          position: sticky; font-size:10px;">{{task.category}}</span>
         <span style="color: #979A9A; margin-right: 5rem;
-          position: sticky;">{{task.dueDate}}</span>
-        <span style="color: #E74C3C; margin-left: -2rem;
+          position: sticky; font-size:10px;">{{task.dueDate}}</span>
+        <span style="color: #E74C3C; margin-right: 1rem;
          position: sticky; position: -webkit-sticky; top: 0;"
           class="fa fa-trash" @click="removeTask(task)"></span>
         </span>
@@ -308,7 +308,7 @@ export default {
   margin-bottom: 1rem;
 }
 
-h2 {
+label {
   font-size: 10px;
 }
 
