@@ -106,15 +106,12 @@
           @click="toggleDone(task)"></span>
 
         <span style="cursor: pointer; padding-right:10rem;"
-         @click="setIsEditing(task)">{{ task.title }}</span>
-        <span  style="color: #E74C3C; margin-right: 3rem; font-size:10px;"
+         @click="setIsEditing(task)">{{ task.title }} </span>
+        <span  style="color: #E74C3C; margin-right: 2rem; font-size:9px; text-align: center;"
         >{{ task.priority }}</span>
-        <span style="color: #979A9A; margin-right: 3rem;
-          position: sticky; font-size:10px;">{{task.category}}</span>
-        <span style="color: #979A9A; margin-right: 5rem;
-          position: sticky; font-size:10px;">{{task.dueDate}}</span>
-        <span style="color: #E74C3C; margin-right: 1rem;
-         position: sticky; position: -webkit-sticky; top: 0;"
+        <span style="color: #979A9A; margin-right: 2rem; font-size:9px; text-align: center;">{{task.category}}</span>
+        <span style="color: #979A9A; margin-right: 2rem; font-size:9px; text-align: center;">{{task.dueDate}}</span>
+        <span style="color: #E74C3C; margin-right: 1rem; top: 0; text-align: center; "
           class="fa fa-trash" @click="removeTask(task)"></span>
         </span>
       </li>

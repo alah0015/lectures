@@ -2,11 +2,11 @@
   <div>
 
     <label>Due date
-      <input  style="width:11rem;" type="date" v-model="newTask.dueDate">
+      <input  style="width:11rem;" type="date" v-model="newTask.dueDate ">
     </label>
 
     <label>Title
-      <input  style="width:11rem;" type="text" v-model.trim="newTask.title" @keyup.enter="addTask">
+      <input  style="width:11rem;" type="text" v-model.trim="newTask.title" @keyup.enter="addTask" maxlength="15">
     </label>
 
     <label>Description
