@@ -1,33 +1,132 @@
 <template>
   <div>
-    <h2>{{listTitle}}</h2>
+    <h2 style="color: #2c3e50; font-size:20px;">{{listTitle}}</h2>
     <div class="toolbar">
-      <label for="priority-filter">Show priority</label>
-      <select name="priority-filter" id="priority-filter" v-model="selectedPriority">
-        <option value="">all</option>
+      <label style="font-size:10px;" for="priority-filter">Show Priority</label>
+      <select style="background-color: #E74C3C; color: white; border-radius: 5%;
+       border: 1px solid #2c3e50;"
+       name="priority-filter" id="priority-filter" v-model="selectedPriority">
+        <option value="">All</option>
         <option
           v-for="option in priorityOptions"
           :value="option"
           :key="option">{{option}}</option>
       </select>
     </div>
+
+    <div style="margin-top:-35px; margin-left:20rem;" class="toolbar">
+      <label style="font-size:10px; margin-left: -2rem;"
+       for="category-filter">Show Category</label>
+      <select style="background-color: #E74C3C; color: white; border-radius: 5%;
+       border: 1px solid #2c3e50;"
+       name="category-filter" id="category-filter" v-model="selectedCategory">
+        <option value="">All</option>
+        <option
+          v-for="option in categoryOptions"
+          :value="option"
+          :key="option">{{option}}</option>
+      </select>
+    </div>
+
+<div style="margin-top:-35px; margin-left:43.8rem;"
+ class="toolbar">
+      <label style="font-size:10px;"
+      for="dueDate-filter">Sort By</label>
+      <select
+        style="background-color: #E74C3C; color: white; border-radius: 5%; border: 1px solid #2c3e50;"
+        name="dueDate-filter"
+        id="dueDate-filter"
+        v-model="sortAscending">
+        <option value="">All</option>
+        <option
+          v-for="option in dueDateOptions"
+          :value="option.value"
+          :key="option.label">{{option.label}}</option>
+      </select>
+    </div>
+
     <ul class="task-list">
-      <li v-for="task in filteredTasks" :key="task.id" class="task-item">
-        <span class="far"
+      <li v-for="task in sortedTasks" :key="task.id" class="task-item">
+       <span v-if="(task.id === isEditing)">
+         <h2>Title</h2>
+         <input type="text" v-model="editingTask.title">
+         <h2>Description</h2>
+         <input type="text" v-model="editingTask.description">
+
+          <div class="toolbar">
+      <label for="category-filter"></label>
+      <select
+       style="background-color: #E74C3C; color: white;
+        border-radius: 5%; border: 1px solid #2c3e50;
+         margin-top: 2rem; margin-bottom: 2rem;
+          margin-left: -0.5rem; width: 10rem;"
+       name="category-filter" id="category-filter"
+        v-model="editingTask.category">
+        <option value="">Category</option>
+        <option
+          v-for="option in categoryOptions"
+          :value="option"
+          :key="option">{{option}}</option>
+      </select>
+    </div>
+
+<div class="toolbar">
+      <label for="priority-filter"></label>
+      <select style="background-color: #E74C3C;
+       color: white; border-radius: 5%; border: 1px solid #2c3e50;
+        margin-top: 0.5rem; margin-bottom: 2rem; margin-left: -0.5rem;
+         width: 10rem;"
+          name="priority-filter" id="priority-filter" v-model="editingTask.priority">
+        <option
+          v-for="option in priorityOptions"
+          :value="option"
+          :key="option">{{option}}</option>
+      </select>
+    </div>
+
+         <button
+          style="background-color: #E74C3C;
+           color: white; border-radius: 5%;
+            border: 1px solid #2c3e50;" @click="saveEditing(task)">SAVE</button>
+          <button
+           style="background-color: #E74C3C;
+            color: white; border-radius: 5%;
+             border: 1px solid #2c3e50;" @click="cancelEditing">Cancel</button>
+       </span>
+
+       <span style="border: 1px solid #E74C3C;
+       width:55rem; height:4rem; margin-top:0.5rem;
+        padding-left:2rem; padding-top:1rem;" v-else>
+        <span style="color: #E74C3C; margin-right: 3rem;"
+         class="fa"
           :class="{
             'fa-circle': ! task.isComplete,
             'fa-check-circle': task.isComplete
           }"
           @click="toggleDone(task)"></span>
-        <span>{{ task.title }}</span>
-        <span>{{ task.priority }}</span>
-        <span class="far fa-trash-alt" @click="removeTask(task)"></span>
+
+        <span style="cursor: pointer; padding-right:10rem;"
+         @click="setIsEditing(task)">{{ task.title }}</span>
+        <span  style="color: #E74C3C; margin-right: 3rem;"
+        >{{ task.priority }}</span>
+        <span style="color: #979A9A; margin-right: 4rem;
+          position: sticky;">{{task.category}}</span>
+        <span style="color: #979A9A; margin-right: 5rem;
+          position: sticky;">{{task.dueDate}}</span>
+        <span style="color: #E74C3C; margin-left: -2rem;
+         position: sticky; position: -webkit-sticky; top: 0;"
+          class="fa fa-trash" @click="removeTask(task)"></span>
+        </span>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
+/* eslint-disable */
+import axios from 'axios'
+
+
 export default {
   // We are not actually managing the task list in this component.
   // We are only displaying the list. The parent component (App.vue) is
@@ -35,9 +134,17 @@ export default {
   props: ['tasks', 'listTitle'],
   data () {
     return {
+      baseURL: 'https://vue-todos.robertmckenney.ca/api',
       priorityOptions: ['low', 'medium', 'high'],
-      selectedPriority: '',
-      selectedCategory: ''
+     selectedPriority: '',
+     categoryOptions: ['Graphic Design', 'Motion Graphic', 'Web development'],
+     selectedCategory: '',
+      dueDateOptions: [{value: true, label: 'Earliest'}, {value: false, label: 'Latest'}],
+      selectedDueDate: '',
+      isEditing: 0,
+      editingTask: {},
+      sortAscending: true
+
     }
   },
   computed: {
@@ -55,23 +162,45 @@ export default {
         ? this.tasks
         : this.tasks.filter(task => task.category === this.selectedCategory)
     },
-    filteredTasks () {
-      return (!this.selectedPriority && !this.selectedCategory)
-        ? this.tasks
-        : this.tasks.filter(task => {
-          let matched = false
-          if (this.selectedPriority && this.selectedCategory) {
-            if (task.priority === this.selectedPriority &&
-                task.category === this.selectedCategory) {
-              matched = true
-            }
-          } else if (this.selectedPriority) {
-            if (task.priority === this.selectedPriority) matched = true
-          } else if (this.selectedCategory) {
-            if (task.category === this.selectedCategory) matched = true
-          }
-          return matched
-        })
+
+    filteredTasks (){
+      const merged = [...new Set(
+        [...this.filteredPriorityTasks, ...this.filteredCategoryTasks]
+      )]
+
+      return merged.filter(task =>
+       this.filteredPriorityTasks.includes(task) &&
+       this.filteredCategoryTasks.includes(task)
+       )
+    },
+    // filteredTasks () {
+    //   return (!this.selectedPriority && !this.selectedCategory && !this.selectedDueDate)
+    //     ? this.tasks
+    //     : this.tasks.filter(task => {
+    //       let matched = false
+    //       if (this.selectedPriority && this.selectedCategory && this.selectedDueDate) {
+    //         if (task.priority === this.selectedPriority &&
+    //             task.category === this.selectedCategory &&
+    //             task.dueDate === this.selectedDueDate) {
+    //           matched = true
+    //         }
+    //       } else if (this.selectedPriority) {
+    //         if (task.priority === this.selectedPriority) matched = true
+    //       } else if (this.selectedCategory) {
+    //         if (task.category === this.selectedCategory) matched = true
+    //        } else if (this.selectedDueDate) {
+    //         if (task.dueDate === this.selectedDueDate) matched = true
+    //       }
+    //       return matched
+    //     })
+    // },
+    sortedTasks () {
+      let allTasks = [...this.filteredTasks]
+      return allTasks.sort((a, b) => {
+        let date1 = new Date(a.dueDate)
+        let date2 = new Date(b.dueDate)
+        return this.sortAscending ? (date1 - date2) : (date2 - date1)
+      })
     }
   },
   methods: {
@@ -86,6 +215,82 @@ export default {
     },
     removeTask (task) {
       this.$emit('removeTask', task)
+    },
+    setIsEditing (task) {
+      this.editingTask = {...task}
+      this.isEditing = task.id
+    },
+    cancelEditing () {
+     this.editingTask = {}
+     this.isEditing = 0
+    },
+    saveEditing (task) {
+      task = Object.assign(task, {...this.editingTask})
+      this.editingTask = {}
+      this.isEditing = 0
+    },
+
+
+    created () {
+
+    axios.get(`${this.baseURL}/priorities`)
+      .then(response => {
+        this.priorityOptions = response.data.data.length
+          ? response.data.data
+          : []
+      })
+      .catch(error => { console.error(error) })
+
+
+      axios.get(`${this.baseURL}/priorities/{Id}`)
+      .then(response => {
+        this.priorityOptions = response.data.data.length
+          ? response.data.data
+          : []
+      })
+      .catch(error => { console.error(error) })
+
+
+
+
+
+       axios.get(`${this.baseURL}/categories`)
+      .then(response => {
+        this.categoryOptions = response.data.data.length
+          ? response.data.data
+          : []
+      })
+      .catch(error => { console.error(error) })
+
+
+        axios.get(`${this.baseURL}/categories/{Id}`)
+      .then(response => {
+        this.categoryOptions = response.data.data.length
+          ? response.data.data
+          : []
+      })
+      .catch(error => { console.error(error) })
+
+
+
+
+       axios.get(`${this.baseURL}/dueDates`)
+      .then(response => {
+        this.dueDateOptions = response.data.data.length
+          ? response.data.data
+          : []
+      })
+      .catch(error => { console.error(error) })
+
+
+        axios.get(`${this.baseURL}/dueDates/{Id}`)
+      .then(response => {
+        this.dueDateOptions = response.data.data.length
+          ? response.data.data
+          : []
+      })
+      .catch(error => { console.error(error) })
+
     }
   }
 }
@@ -102,4 +307,14 @@ export default {
 .toolbar {
   margin-bottom: 1rem;
 }
+
+h2 {
+  font-size: 10px;
+}
+
+span:hover{
+  background-color:rgb(243, 240, 240);
+  transition: 0.4s;
+}
+
 </style>

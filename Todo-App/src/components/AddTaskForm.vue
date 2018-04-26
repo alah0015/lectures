@@ -1,17 +1,27 @@
 <template>
   <div>
+
     <label>Due date
       <input type="date" v-model="newTask.dueDate">
     </label>
+
     <label>Title
       <input type="text" v-model.trim="newTask.title" @keyup.enter="addTask">
     </label>
-    <select v-model="newTask.priority">
+
+    <select style="background-color: #E74C3C; color: white;
+     border-radius: 5%; border: 1px solid #2c3e50; margin-left: 2.5rem;"
+      v-model="newTask.priority">
       <option value="high">high</option>
       <option value="medium">medium</option>
       <option value="low">low</option>
     </select>
-    <button @click="addTask">Add Task</button>
+
+    <button
+      style="background-color: #E74C3C; color: white; border-radius: 5%; border: 1px solid #2c3e50; margin-top: 2rem;"
+      @click="addTask"
+    >Add Task</button>
+
   </div>
 </template>
 
@@ -19,7 +29,9 @@
 export default {
   data () {
     return {
+      baseURL: 'https://vue-todos.robertmckenney.ca/api',
       newTask: {}
+
     }
   },
 
@@ -36,15 +48,16 @@ export default {
 
     getNewTask () {
       const now = new Date()
-      const today = now.toISOString().substr(0, now.toISOString().indexOf('T'))
+      const today = now.toISOString().substr([0], now.toISOString().indexOf('T'))
       console.log(now)
       return {
-        id: null,
+        id: (new Date()).getMilliseconds(),
         category: '',
         dueDate: today,
         isComplete: false,
         priority: 'medium',
-        title: ''
+        title: '',
+        description: ''
       }
     }
   }
